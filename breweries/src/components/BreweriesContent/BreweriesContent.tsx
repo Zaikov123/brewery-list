@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
 import { EmptyState } from "../EmptyState";
@@ -44,6 +44,30 @@ export function BreweriesContent({
     console.log("Deleted breweries:", breweryIdsToDelete);
   };
 
+  const totalItems = breweries.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+
+  let startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  if (currentPage === totalPages && totalItems < currentPage * ITEMS_PER_PAGE) {
+    startIndex = Math.max(0, totalItems - ITEMS_PER_PAGE);
+  }
+
+  const paginatedBreweries = breweries.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    const newTotalPages = Math.max(
+      1,
+      Math.ceil(breweries.length / ITEMS_PER_PAGE)
+    );
+    if (currentPage > newTotalPages) {
+      setCurrentPage(newTotalPages);
+    }
+  }, [breweries.length]);
+
+  
   if (isLoading) {
     return <Loading />;
   }
@@ -51,10 +75,6 @@ export function BreweriesContent({
   if (breweries.length === 0) {
     return <EmptyState />;
   }
-
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedBreweries = breweries.slice(startIndex, endIndex);
 
   return (
     <div className={styles.content}>
@@ -70,7 +90,7 @@ export function BreweriesContent({
               onClick={handleDeleteSelected}
               title="Delete selected breweries"
             >
-              🗑️ Delete
+              Delete
             </button>
             <button
               className={styles.clearButton}
