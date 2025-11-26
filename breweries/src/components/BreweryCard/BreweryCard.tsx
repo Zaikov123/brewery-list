@@ -3,11 +3,26 @@ import styles from "./BreweryCard.module.css";
 
 interface BreweryCardProps {
   brewery: Brewery;
+  isSelected: boolean;
+  onContextMenu: (breweryId: string) => void;
 }
 
-export function BreweryCard({ brewery }: BreweryCardProps) {
+export function BreweryCard({
+  brewery,
+  isSelected,
+  onContextMenu,
+}: BreweryCardProps) {
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onContextMenu(brewery.id);
+  };
+
   return (
-    <div className={styles.card}>
+    <div
+      className={`${styles.card} ${isSelected ? styles.selected : ""}`}
+      onContextMenu={handleContextMenu}
+    >
+      {isSelected && <div className={styles.selectedBadge}>✓</div>}
       <h2 className={styles.cardTitle}>{brewery.name}</h2>
       <div className={styles.cardContent}>
         {brewery.brewery_type && (
@@ -27,6 +42,7 @@ export function BreweryCard({ brewery }: BreweryCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
+            onClick={(e) => e.stopPropagation()}
           >
             Visit Website →
           </a>
