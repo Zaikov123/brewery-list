@@ -5,6 +5,7 @@ import { EmptyState } from "../EmptyState";
 import { BreweryGrid } from "../BreweryGrid";
 import { Pagination } from "../Pagination";
 import styles from "./BreweriesContent.module.css";
+import { useBreweriesStore } from "@/store/useBreweriesStore";
 
 interface BreweriesContentProps {
   breweries: Brewery[];
@@ -22,6 +23,8 @@ export function BreweriesContent({
     new Set()
   );
 
+  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);
+
   const handleSelectBrewery = (breweryId: string) => {
     setSelectedBreweries((prev) => {
       const newSet = new Set(prev);
@@ -32,6 +35,13 @@ export function BreweriesContent({
       }
       return newSet;
     });
+  };
+
+  const handleDeleteSelected = () => {
+    const breweryIdsToDelete = Array.from(selectedBreweries);
+    removeBreweries(breweryIdsToDelete);
+    setSelectedBreweries(new Set());
+    console.log("Deleted breweries:", breweryIdsToDelete);
   };
 
   if (isLoading) {
@@ -54,12 +64,21 @@ export function BreweriesContent({
           <span className={styles.text}>
             {selectedBreweries.size === 1 ? "brewery" : "breweries"} selected
           </span>
-          <button
-            className={styles.clearButton}
-            onClick={() => setSelectedBreweries(new Set())}
-          >
-            Clear
-          </button>
+          <div className={styles.buttonGroup}>
+            <button
+              className={styles.deleteButton}
+              onClick={handleDeleteSelected}
+              title="Delete selected breweries"
+            >
+              🗑️ Delete
+            </button>
+            <button
+              className={styles.clearButton}
+              onClick={() => setSelectedBreweries(new Set())}
+            >
+              Clear
+            </button>
+          </div>
         </div>
       )}
       <BreweryGrid

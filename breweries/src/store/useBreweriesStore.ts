@@ -5,6 +5,7 @@ interface BreweriesState {
   breweries: Brewery[];
   isLoading: boolean;
   fetchBreweries: () => Promise<void>;
+  removeBreweries: (breweryIds: string[]) => void;
 }
 
 export const useBreweriesStore = create<BreweriesState>((set) => ({
@@ -31,5 +32,12 @@ export const useBreweriesStore = create<BreweriesState>((set) => ({
       breweries: isValidBreweryArray ? (rawData as Brewery[]) : [],
       isLoading: false,
     });
+  },
+  removeBreweries: (breweryIds: string[]) => {
+    set((state) => ({
+      breweries: state.breweries.filter(
+        (brewery) => !breweryIds.includes(brewery.id)
+      ),
+    }));
   },
 }));
