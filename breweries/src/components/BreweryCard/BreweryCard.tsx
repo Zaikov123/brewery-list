@@ -5,12 +5,14 @@ interface BreweryCardProps {
   brewery: Brewery;
   isSelected: boolean;
   onContextMenu: (breweryId: string) => void;
+  onClick: () => void;
 }
 
 export function BreweryCard({
   brewery,
   isSelected,
   onContextMenu,
+  onClick,
 }: BreweryCardProps) {
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -21,6 +23,7 @@ export function BreweryCard({
     <div
       className={`${styles.card} ${isSelected ? styles.selected : ""}`}
       onContextMenu={handleContextMenu}
+      onClick={onClick}
     >
       {isSelected && <div className={styles.selectedBadge}>✓</div>}
       <h2 className={styles.cardTitle}>{brewery.name}</h2>
@@ -42,7 +45,6 @@ export function BreweryCard({
             target="_blank"
             rel="noopener noreferrer"
             className={styles.link}
-            onClick={(e) => e.stopPropagation()}
           >
             Visit Website →
           </a>

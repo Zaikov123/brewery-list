@@ -1,0 +1,1 @@
+export { BreweryDetail } from "./BreweryDetail";

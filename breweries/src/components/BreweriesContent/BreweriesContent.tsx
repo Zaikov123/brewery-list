@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from "react";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
@@ -87,7 +88,6 @@ export function BreweriesContent({
           <div className={styles.buttonGroup}>
             <button
               className={styles.deleteButton}
-              onClick={handleDeleteSelected}
               title="Delete selected breweries"
             >
               Delete
