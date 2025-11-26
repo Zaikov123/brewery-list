@@ -1,0 +1,9 @@
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--foreground);
+  font-size: 18px;
+  opacity: 0.6;
+}
