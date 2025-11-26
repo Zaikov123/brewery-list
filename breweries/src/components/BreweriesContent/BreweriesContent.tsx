@@ -89,6 +89,7 @@ export function BreweriesContent({
             <button
               className={styles.deleteButton}
               title="Delete selected breweries"
+              onClick={handleDeleteSelected}
             >
               Delete
             </button>
