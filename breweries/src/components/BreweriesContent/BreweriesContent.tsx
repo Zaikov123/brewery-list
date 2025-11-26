@@ -18,6 +18,21 @@ export function BreweriesContent({
   isLoading,
 }: BreweriesContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedBreweries, setSelectedBreweries] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleSelectBrewery = (breweryId: string) => {
+    setSelectedBreweries((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(breweryId)) {
+        newSet.delete(breweryId);
+      } else {
+        newSet.add(breweryId);
+      }
+      return newSet;
+    });
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -33,7 +48,25 @@ export function BreweriesContent({
 
   return (
     <div className={styles.content}>
-      <BreweryGrid breweries={paginatedBreweries} />
+      {selectedBreweries.size > 0 && (
+        <div className={styles.selectedInfo}>
+          <span className={styles.badge}>{selectedBreweries.size}</span>
+          <span className={styles.text}>
+            {selectedBreweries.size === 1 ? "brewery" : "breweries"} selected
+          </span>
+          <button
+            className={styles.clearButton}
+            onClick={() => setSelectedBreweries(new Set())}
+          >
+            Clear
+          </button>
+        </div>
+      )}
+      <BreweryGrid
+        breweries={paginatedBreweries}
+        selectedBreweries={selectedBreweries}
+        onSelectBrewery={handleSelectBrewery}
+      />
       <Pagination
         currentPage={currentPage}
         totalItems={breweries.length}
