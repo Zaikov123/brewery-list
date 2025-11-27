@@ -1,5 +1,4 @@
 'use client';
-import { useState, useEffect } from "react";
 import { useSelection } from "@/lib/hooks/useSelection";
 import { usePagination } from "@/lib/hooks/usePagination";
 import { Brewery } from "@/types/Brewery";
@@ -16,11 +15,11 @@ interface BreweriesContentProps {
 }
 
 const ITEMS_PER_PAGE = 5;
-const RENDERED_PAGES = 3;
+const CHUNK_SIZE = 15;
 
 export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps) {
   const { selected, toggle, clear } = useSelection();
-  const { visibleItems, currentPage, setCurrentPage, loadNextPage } = usePagination(breweries, ITEMS_PER_PAGE, RENDERED_PAGES);
+  const { visibleItems, renderedItems, currentPage, totalPages, setCurrentPage, loadNextPage, loadPrevPage } = usePagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
   const removeBreweries = useBreweriesStore((state) => state.removeBreweries);  
 
   const handleDeleteSelected = () => {
@@ -63,9 +62,10 @@ export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps
       <div className={styles.paginationWrapper}>
         <Pagination
           currentPage={currentPage}
-          totalItems={breweries.length}
-          itemsPerPage={ITEMS_PER_PAGE}
+          totalPages={totalPages}
           onPageChange={setCurrentPage}
+          onNextPage={loadNextPage}
+          onPrevPage={loadPrevPage}
         />
       </div>
     </div>

@@ -2,33 +2,19 @@ import styles from "./Pagination.module.css";
 
 interface PaginationProps {
   currentPage: number;
-  totalItems: number;
-  itemsPerPage: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
+  onNextPage: () => void;
+  onPrevPage: () => void;
 }
 
 export function Pagination({
   currentPage,
-  totalItems,
-  itemsPerPage,
+  totalPages,
   onPageChange,
+  onNextPage,
+  onPrevPage,
 }: PaginationProps) {
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  function getVisiblePages(current: number, total: number) {
-    const delta = 1; // показывать слева и справа
-    const range: (number | "...")[] = [];
-    for (let i = 1; i <= total; i++) {
-      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-        range.push(i);
-      } else if (range[range.length - 1] !== "...") {
-        range.push("...");
-      }
-    }
-    return range;
-  }
-
   if (totalPages <= 1) {
     return null;
   }
@@ -38,7 +24,7 @@ export function Pagination({
     <div className={styles.pagination}>      
       <button
         className={styles.button}
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={onPrevPage}
         disabled={currentPage === 1}
       >
         ← Previous
@@ -60,7 +46,7 @@ export function Pagination({
 
       <button
         className={styles.button}
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={onNextPage}
         disabled={currentPage === totalPages}
       >
         Next →
@@ -70,7 +56,7 @@ export function Pagination({
       <button
         className={styles.button}
         disabled={currentPage === 1}
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={onPrevPage}
       >
         ←
       </button>
@@ -78,7 +64,7 @@ export function Pagination({
       <button
         className={styles.button}
         disabled={currentPage === totalPages}
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={onNextPage}
       >
         →
       </button>
