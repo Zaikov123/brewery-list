@@ -1,13 +1,14 @@
-'use client';
+"use client";
 import { useSelection } from "@/lib/hooks/useSelection";
-import { usePagination } from "@/lib/hooks/usePagination";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
 import { EmptyState } from "../EmptyState";
 import { BreweryGrid } from "../BreweryGrid";
-import { Pagination } from "../Pagination";
 import styles from "./BreweriesContent.module.css";
 import { useBreweriesStore } from "@/store/useBreweriesStore";
+import { useEffect, useRef } from "react";
+import { useInfiniteScrollPagination } from "@/lib/hooks/useInfiniteScrollPagination";
+
 
 interface BreweriesContentProps {
   breweries: Brewery[];
@@ -17,10 +18,14 @@ interface BreweriesContentProps {
 const ITEMS_PER_PAGE = 5;
 const CHUNK_SIZE = 15;
 
-export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps) {
+export function BreweriesContent({
+  breweries,
+  isLoading,
+}: BreweriesContentProps) {
   const { selected, toggle, clear } = useSelection();
-  const { visibleItems, renderedItems, currentPage, totalPages, setCurrentPage, loadNextPage, loadPrevPage } = usePagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
-  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);  
+  const { visibleItems, currentPage, totalPages, loadNextPage, sentinelRef } = useInfiniteScrollPagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
+  
+  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);
 
   const handleDeleteSelected = () => {
     const breweryIdsToDelete = Array.from(selected);
@@ -41,7 +46,10 @@ export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps
             {selected.size === 1 ? "brewery" : "breweries"} selected
           </span>
           <div className={styles.buttonGroup}>
-            <button className={styles.deleteButton} onClick={handleDeleteSelected}>
+            <button
+              className={styles.deleteButton}
+              onClick={handleDeleteSelected}
+            >
               Delete
             </button>
             <button className={styles.clearButton} onClick={() => clear()}>
@@ -58,16 +66,7 @@ export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps
           onSelectBrewery={toggle}
         />
       </div>
-
-      <div className={styles.paginationWrapper}>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onNextPage={loadNextPage}
-          onPrevPage={loadPrevPage}
-        />
-      </div>
+      <div ref={sentinelRef} style={{ height: "20px" }} />
     </div>
   );
 }

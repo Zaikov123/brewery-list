@@ -8,6 +8,9 @@
   padding: 20px;
 }
 
+.grid > div{
+  display: block;
+}
 .grid > *:nth-child(1) { grid-column: span 2; grid-row: 1; }
 .grid > *:nth-child(2) { grid-column: span 2; grid-row: 1; }
 .grid > *:nth-child(3) { grid-column: span 2; grid-row: 1; }
