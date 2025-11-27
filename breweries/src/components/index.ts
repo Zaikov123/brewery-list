@@ -5,3 +5,4 @@ export { BreweryCard } from "./BreweryCard";
 export { BreweryGrid } from "./BreweryGrid";
 export { BreweriesContent } from "./BreweriesContent";
 export { Pagination } from "./Pagination";
+export { BreweryDetail } from "./BreweryDetail";

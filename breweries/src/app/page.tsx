@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useBreweriesStore } from "../store/useBreweriesStore";
-import { Header, BreweriesContent } from "@/components";
+import { Header, BreweriesContent, BreweryDetail  } from "@/components";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -16,7 +16,10 @@ export default function Home() {
     <div className={styles.container}>
       <Header />
       <main className={styles.main}>
-        <BreweriesContent breweries={breweries} isLoading={isLoading} />
+        <BreweriesContent 
+        breweries={breweries}
+        isLoading={isLoading} 
+        />
       </main>
     </div>
   );

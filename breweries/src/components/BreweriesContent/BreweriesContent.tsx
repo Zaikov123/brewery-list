@@ -1,4 +1,7 @@
+'use client';
 import { useState, useEffect } from "react";
+import { useSelection } from "@/lib/hooks/useSelection"
+import { usePagination } from "@/lib/hooks/usePagination";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
 import { EmptyState } from "../EmptyState";
@@ -18,55 +21,16 @@ export function BreweriesContent({
   breweries,
   isLoading,
 }: BreweriesContentProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBreweries, setSelectedBreweries] = useState<Set<string>>(
-    new Set()
-  );
-
-  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);
-
-  const handleSelectBrewery = (breweryId: string) => {
-    setSelectedBreweries((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(breweryId)) {
-        newSet.delete(breweryId);
-      } else {
-        newSet.add(breweryId);
-      }
-      return newSet;
-    });
-  };
+  const { selected, toggle, clear } = useSelection();
+  const {paginatedItems, currentPage, setCurrentPage, totalPages} = usePagination(breweries, ITEMS_PER_PAGE);
+  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);  
 
   const handleDeleteSelected = () => {
-    const breweryIdsToDelete = Array.from(selectedBreweries);
+    const breweryIdsToDelete = Array.from(selected);
     removeBreweries(breweryIdsToDelete);
-    setSelectedBreweries(new Set());
+    clear();
     console.log("Deleted breweries:", breweryIdsToDelete);
   };
-
-  const totalItems = breweries.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
-
-  let startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  if (currentPage === totalPages && totalItems < currentPage * ITEMS_PER_PAGE) {
-    startIndex = Math.max(0, totalItems - ITEMS_PER_PAGE);
-  }
-
-  const paginatedBreweries = breweries.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
-
-  useEffect(() => {
-    const newTotalPages = Math.max(
-      1,
-      Math.ceil(breweries.length / ITEMS_PER_PAGE)
-    );
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages);
-    }
-  }, [breweries.length]);
-
   
   if (isLoading) {
     return <Loading />;
@@ -78,23 +42,23 @@ export function BreweriesContent({
 
   return (
     <div className={styles.content}>
-      {selectedBreweries.size > 0 && (
+      {selected.size > 0 && (
         <div className={styles.selectedInfo}>
-          <span className={styles.badge}>{selectedBreweries.size}</span>
+          <span className={styles.badge}>{selected.size}</span>
           <span className={styles.text}>
-            {selectedBreweries.size === 1 ? "brewery" : "breweries"} selected
+            {selected.size === 1 ? "brewery" : "breweries"} selected
           </span>
           <div className={styles.buttonGroup}>
             <button
               className={styles.deleteButton}
-              onClick={handleDeleteSelected}
               title="Delete selected breweries"
+              onClick={handleDeleteSelected}
             >
               Delete
             </button>
             <button
               className={styles.clearButton}
-              onClick={() => setSelectedBreweries(new Set())}
+              onClick={() => clear()}
             >
               Clear
             </button>
@@ -102,9 +66,9 @@ export function BreweriesContent({
         </div>
       )}
       <BreweryGrid
-        breweries={paginatedBreweries}
-        selectedBreweries={selectedBreweries}
-        onSelectBrewery={handleSelectBrewery}
+        breweries={paginatedItems}
+        selectedBreweries={selected}
+        onSelectBrewery={toggle}
       />
       <Pagination
         currentPage={currentPage}
