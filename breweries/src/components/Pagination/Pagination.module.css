@@ -8,6 +8,10 @@
   flex-wrap: wrap;
 }
 
+.paginationMobile {
+  display: none;
+}
+
 .button {
   padding: 8px 16px;
   border: 1px solid var(--border);
@@ -64,12 +68,32 @@
   box-shadow: var(--shadow);
 }
 
+.ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
 @media (max-width: 768px) {
   .pagination {
-    margin-top: 30px;
-    padding: 16px;
+    display: none;;
   }
 
+  .paginationMobile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .paginationMobile .button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
   .pageButton {
     width: 36px;
     height: 36px;

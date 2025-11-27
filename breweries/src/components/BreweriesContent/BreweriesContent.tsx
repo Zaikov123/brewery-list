@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useSelection } from "@/lib/hooks/useSelection"
+import { useSelection } from "@/lib/hooks/useSelection";
 import { usePagination } from "@/lib/hooks/usePagination";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
@@ -15,14 +15,12 @@ interface BreweriesContentProps {
   isLoading: boolean;
 }
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 5;
+const RENDERED_PAGES = 3;
 
-export function BreweriesContent({
-  breweries,
-  isLoading,
-}: BreweriesContentProps) {
+export function BreweriesContent({ breweries, isLoading }: BreweriesContentProps) {
   const { selected, toggle, clear } = useSelection();
-  const {paginatedItems, currentPage, setCurrentPage, totalPages} = usePagination(breweries, ITEMS_PER_PAGE);
+  const { visibleItems, currentPage, setCurrentPage, loadNextPage } = usePagination(breweries, ITEMS_PER_PAGE, RENDERED_PAGES);
   const removeBreweries = useBreweriesStore((state) => state.removeBreweries);  
 
   const handleDeleteSelected = () => {
@@ -31,14 +29,9 @@ export function BreweriesContent({
     clear();
     console.log("Deleted breweries:", breweryIdsToDelete);
   };
-  
-  if (isLoading) {
-    return <Loading />;
-  }
 
-  if (breweries.length === 0) {
-    return <EmptyState />;
-  }
+  if (isLoading) return <Loading />;
+  if (breweries.length === 0) return <EmptyState />;
 
   return (
     <div className={styles.content}>
@@ -49,33 +42,32 @@ export function BreweriesContent({
             {selected.size === 1 ? "brewery" : "breweries"} selected
           </span>
           <div className={styles.buttonGroup}>
-            <button
-              className={styles.deleteButton}
-              title="Delete selected breweries"
-              onClick={handleDeleteSelected}
-            >
+            <button className={styles.deleteButton} onClick={handleDeleteSelected}>
               Delete
             </button>
-            <button
-              className={styles.clearButton}
-              onClick={() => clear()}
-            >
+            <button className={styles.clearButton} onClick={() => clear()}>
               Clear
             </button>
           </div>
         </div>
       )}
-      <BreweryGrid
-        breweries={paginatedItems}
-        selectedBreweries={selected}
-        onSelectBrewery={toggle}
-      />
-      <Pagination
-        currentPage={currentPage}
-        totalItems={breweries.length}
-        itemsPerPage={ITEMS_PER_PAGE}
-        onPageChange={setCurrentPage}
-      />
+
+      <div className={styles.gridWrapper}>
+        <BreweryGrid
+          breweries={visibleItems}
+          selectedBreweries={selected}
+          onSelectBrewery={toggle}
+        />
+      </div>
+
+      <div className={styles.paginationWrapper}>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={breweries.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }
