@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { Brewery } from "../types/Brewery";
+import { getBreweries } from "@/lib/api";
 
 interface BreweriesState {
   breweries: Brewery[];
@@ -15,8 +16,7 @@ export const useBreweriesStore = create<BreweriesState>((set) => ({
   fetchBreweries: async () => {
     set({ isLoading: true });
 
-    const res = await fetch("https://api.openbrewerydb.org/v1/breweries");
-    const rawData = await res.json();
+    const rawData = await getBreweries();
 
     const isValidBreweryArray =
       Array.isArray(rawData) &&

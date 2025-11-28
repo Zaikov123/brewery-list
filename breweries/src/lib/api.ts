@@ -15,7 +15,11 @@ async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export async function getBreweries(page: number, limit: number = 10): Promise<Brewery[]> {
+export async function getBreweries(): Promise<Brewery[]> {
+  return apiFetch<Brewery[]>(`${BASE_URL}`);
+}
+
+export async function getLimitedBreweries(page: number, limit: number = 10): Promise<Brewery[]> {
   return apiFetch<Brewery[]>(`${BASE_URL}?page=${page}&per_page=${limit}`);
 }
 
