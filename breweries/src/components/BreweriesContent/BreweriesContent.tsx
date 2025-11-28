@@ -7,7 +7,9 @@ import { BreweryGrid } from "../BreweryGrid";
 import styles from "./BreweriesContent.module.css";
 import { useBreweriesStore } from "@/store/useBreweriesStore";
 import { useEffect, useRef } from "react";
-import { useInfiniteScrollPagination } from "@/lib/hooks/useInfiniteScrollPagination";
+import { usePagination } from "@/lib/hooks/usePagination";
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
+import { Pagination } from "../Pagination";
 
 
 interface BreweriesContentProps {
@@ -23,7 +25,8 @@ export function BreweriesContent({
   isLoading,
 }: BreweriesContentProps) {
   const { selected, toggle, clear } = useSelection();
-  const { visibleItems, currentPage, totalPages, loadNextPage, sentinelRef } = useInfiniteScrollPagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
+  const { visibleItems, renderedItems, currentPage, totalPages, setCurrentPage, loadNextPage, loadPrevPage } = usePagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
+  const { sentinelRef, scrollTargetRef } = useInfiniteScroll(loadNextPage, currentPage, totalPages);
   
   const removeBreweries = useBreweriesStore((state) => state.removeBreweries);
 
@@ -58,7 +61,7 @@ export function BreweriesContent({
           </div>
         </div>
       )}
-
+      <div ref={scrollTargetRef}></div>
       <div className={styles.gridWrapper}>
         <BreweryGrid
           breweries={visibleItems}
@@ -66,6 +69,13 @@ export function BreweriesContent({
           onSelectBrewery={toggle}
         />
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        onNextPage={loadNextPage}
+        onPrevPage={loadPrevPage}
+      />
       <div ref={sentinelRef} style={{ height: "20px" }} />
     </div>
   );
