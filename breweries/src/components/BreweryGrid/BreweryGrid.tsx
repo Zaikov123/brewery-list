@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Brewery } from "@/types/Brewery";
 import { BreweryCard } from "../BreweryCard";
 import { useRouter } from "next/navigation";

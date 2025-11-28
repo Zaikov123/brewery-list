@@ -1,29 +1,34 @@
-'use client';
-import { useState, useEffect } from "react";
-import { useSelection } from "@/lib/hooks/useSelection"
-import { usePagination } from "@/lib/hooks/usePagination";
+"use client";
+import { useSelection } from "@/lib/hooks/useSelection";
 import { Brewery } from "@/types/Brewery";
 import { Loading } from "../Loading";
 import { EmptyState } from "../EmptyState";
 import { BreweryGrid } from "../BreweryGrid";
-import { Pagination } from "../Pagination";
 import styles from "./BreweriesContent.module.css";
 import { useBreweriesStore } from "@/store/useBreweriesStore";
+import { useEffect, useRef } from "react";
+import { usePagination } from "@/lib/hooks/usePagination";
+import { useInfiniteScroll } from "@/lib/hooks/useInfiniteScroll";
+import { Pagination } from "../Pagination";
+
 
 interface BreweriesContentProps {
   breweries: Brewery[];
   isLoading: boolean;
 }
 
-const ITEMS_PER_PAGE = 15;
+const ITEMS_PER_PAGE = 5;
+const CHUNK_SIZE = 15;
 
 export function BreweriesContent({
   breweries,
   isLoading,
 }: BreweriesContentProps) {
   const { selected, toggle, clear } = useSelection();
-  const {paginatedItems, currentPage, setCurrentPage, totalPages} = usePagination(breweries, ITEMS_PER_PAGE);
-  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);  
+  const { visibleItems, renderedItems, currentPage, totalPages, setCurrentPage, loadNextPage, loadPrevPage } = usePagination(breweries, ITEMS_PER_PAGE, CHUNK_SIZE);
+  const { sentinelRef, scrollTargetRef } = useInfiniteScroll(loadNextPage, currentPage, totalPages);
+  
+  const removeBreweries = useBreweriesStore((state) => state.removeBreweries);
 
   const handleDeleteSelected = () => {
     const breweryIdsToDelete = Array.from(selected);
@@ -31,14 +36,9 @@ export function BreweriesContent({
     clear();
     console.log("Deleted breweries:", breweryIdsToDelete);
   };
-  
-  if (isLoading) {
-    return <Loading />;
-  }
 
-  if (breweries.length === 0) {
-    return <EmptyState />;
-  }
+  if (isLoading) return <Loading />;
+  if (breweries.length === 0) return <EmptyState />;
 
   return (
     <div className={styles.content}>
@@ -51,31 +51,32 @@ export function BreweriesContent({
           <div className={styles.buttonGroup}>
             <button
               className={styles.deleteButton}
-              title="Delete selected breweries"
               onClick={handleDeleteSelected}
             >
               Delete
             </button>
-            <button
-              className={styles.clearButton}
-              onClick={() => clear()}
-            >
+            <button className={styles.clearButton} onClick={() => clear()}>
               Clear
             </button>
           </div>
         </div>
       )}
-      <BreweryGrid
-        breweries={paginatedItems}
-        selectedBreweries={selected}
-        onSelectBrewery={toggle}
-      />
+      <div ref={scrollTargetRef}></div>
+      <div className={styles.gridWrapper}>
+        <BreweryGrid
+          breweries={visibleItems}
+          selectedBreweries={selected}
+          onSelectBrewery={toggle}
+        />
+      </div>
       <Pagination
         currentPage={currentPage}
-        totalItems={breweries.length}
-        itemsPerPage={ITEMS_PER_PAGE}
+        totalPages={totalPages}
         onPageChange={setCurrentPage}
+        onNextPage={loadNextPage}
+        onPrevPage={loadPrevPage}
       />
+      <div ref={sentinelRef} style={{ height: "20px" }} />
     </div>
   );
 }

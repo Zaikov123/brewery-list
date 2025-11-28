@@ -1,25 +1,38 @@
-.countBadge {
-  display: inline-block;
-  background: var(--primary);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 30px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-areas: 
+  " a a b b c c "
+  " d d d e e e ";
   gap: 24px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 40px;
 }
+
+.grid > * {
+  height: 100%;
+}
+.grid > div{
+  display: block;
+}
+
+.grid > *:nth-child(1) { grid-area: a;}
+.grid > *:nth-child(2) { grid-area: b;}
+.grid > *:nth-child(3) { grid-area: c;}
+.grid > *:nth-child(4) { grid-area: d;}
+.grid > *:nth-child(5) { grid-area: e;}
 
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      " a "
+      " b "
+      " c "
+      " d "
+      " e ";
     gap: 16px;
   }
 }
